@@ -1,0 +1,119 @@
+Enum "MemberRole" {
+  "ADMIN"
+  "MODERATOR"
+  "GUEST"
+}
+
+Enum "ChannelType" {
+  "TEXT"
+  "AUDIO"
+  "VIDEO"
+}
+
+Table "Profile" {
+  "id" TEXT [not null]
+  "userId" TEXT [not null]
+  "name" TEXT [not null]
+  "imageUrl" TEXT [not null]
+  "email" TEXT [not null]
+  "createdAt" TIMESTAMP(3) [not null, default: `CURRENT_TIMESTAMP`]
+  "updatedAt" TIMESTAMP(3) [not null]
+
+Indexes {
+  id [pk, name: "Profile_pkey"]
+  userId [unique, name: "Profile_userId_key"]
+}
+}
+
+Table "Server" {
+  "id" TEXT [not null]
+  "name" TEXT [not null]
+  "imageUrl" TEXT [not null]
+  "inviteCode" TEXT [not null]
+  "profileId" TEXT [not null]
+  "createdAt" TIMESTAMP(3) [not null, default: `CURRENT_TIMESTAMP`]
+  "updatedAt" TIMESTAMP(3) [not null]
+
+Indexes {
+  id [pk, name: "Server_pkey"]
+  inviteCode [unique, name: "Server_inviteCode_key"]
+  profileId [name: "Server_profileId_idx"]
+}
+}
+
+Table "Member" {
+  "id" TEXT [not null]
+  "role" MemberRole [not null, default: "GUEST"]
+  "profileId" TEXT [not null]
+  "serverId" TEXT [not null]
+  "createdAt" TIMESTAMP(3) [not null, default: `CURRENT_TIMESTAMP`]
+  "updatedAt" TIMESTAMP(3) [not null]
+
+Indexes {
+  id [pk, name: "Member_pkey"]
+  profileId [name: "Member_profileId_idx"]
+  serverId [name: "Member_serverId_idx"]
+}
+}
+
+Table "Channel" {
+  "id" TEXT [not null]
+  "name" TEXT [not null]
+  "type" ChannelType [not null, default: "TEXT"]
+  "profileId" TEXT [not null]
+  "serverId" TEXT [not null]
+  "createdAt" TIMESTAMP(3) [not null, default: `CURRENT_TIMESTAMP`]
+  "updatedAt" TIMESTAMP(3) [not null]
+
+Indexes {
+  id [pk, name: "Channel_pkey"]
+  profileId [name: "Channel_profileId_idx"]
+  serverId [name: "Channel_serverId_idx"]
+}
+}
+
+Table "Message" {
+  "id" TEXT [not null]
+  "content" TEXT [not null]
+  "fileUrl" TEXT
+  "memberId" TEXT [not null]
+  "channelId" TEXT [not null]
+  "deleted" BOOLEAN [not null, default: false]
+  "createdAt" TIMESTAMP(3) [not null, default: `CURRENT_TIMESTAMP`]
+  "updatedAt" TIMESTAMP(3) [not null]
+
+Indexes {
+  id [pk, name: "Message_pkey"]
+  channelId [name: "Message_channelId_idx"]
+  memberId [name: "Message_memberId_idx"]
+}
+}
+
+Table "Conversation" {
+  "id" TEXT [not null]
+  "memberOneId" TEXT [not null]
+  "memberTwoId" TEXT [not null]
+
+Indexes {
+  id [pk, name: "Conversation_pkey"]
+  memberTwoId [name: "Conversation_memberTwoId_idx"]
+  (memberOneId, memberTwoId) [unique, name: "Conversation_memberOneId_memberTwoId_key"]
+}
+}
+
+Table "DirectMessage" {
+  "id" TEXT [not null]
+  "content" TEXT [not null]
+  "fileUrl" TEXT
+  "memberId" TEXT [not null]
+  "conversationId" TEXT [not null]
+  "deleted" BOOLEAN [not null, default: false]
+  "createdAt" TIMESTAMP(3) [not null, default: `CURRENT_TIMESTAMP`]
+  "updatedAt" TIMESTAMP(3) [not null]
+
+Indexes {
+  id [pk, name: "DirectMessage_pkey"]
+  memberId [name: "DirectMessage_memberId_idx"]
+  conversationId [name: "DirectMessage_conversationId_idx"]
+}
+}
